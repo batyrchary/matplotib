@@ -22,11 +22,11 @@ class ViewController: UIViewController {
     //Name:whatever
     //Type:UILabel
     //Storage:farketmez shu an
-    @IBOutlet weak var display: UILabel!
+    @IBOutlet private weak var display: UILabel!
     
     //u are not allowed to have values without initial values
     
-    var userIsInTheMiddleOFTyping: Bool = false
+    private var userIsInTheMiddleOFTyping: Bool = false
     
     //control key drag and drop
     //Connection:Action
@@ -34,7 +34,7 @@ class ViewController: UIViewController {
     //Type:UIButton
     //Event:touchupInside
     //Argument:Sender
-    @IBAction func touchDigit(_ sender: UIButton) {
+    @IBAction private func touchDigit(_ sender: UIButton) {
         
         //var digit = sender.currentTitle
         //var gives us warning if your var is local and never changes in the other words if it is contant use let
@@ -60,18 +60,43 @@ class ViewController: UIViewController {
         print("touched one is \(String(describing: digit))")
         print("touchDigit pressed")
     }
-    //same as numbers
-    @IBAction func operation(_ sender: UIButton) {
-        userIsInTheMiddleOFTyping=false
-        //inside of this if it is string outside of it, it is nil, not defined
-        if let mathsymbol = sender.currentTitle{
-         
-            if mathsymbol == "pi"
-            {
-                display.text=String(M_PI) //converted double to string
-            }
+    
+   private var displayedValue: Double{
+        get{
+            return Double(display.text!)! //we have ! in the end for case "hello"
+        }
+        set{
+            display.text=String(newValue)
         }
     }
+    
+    private var brain: CalculatorBrainModel = CalculatorBrainModel()
+    //same as numbers
+    @IBAction private func operation(_ sender: UIButton) {
+        //userIsInTheMiddleOFTyping=false
+        //inside of this if it is string outside of it, it is nil, not defined
+        
+        if userIsInTheMiddleOFTyping{
+            brain.setOperand(operand: displayedValue)
+            userIsInTheMiddleOFTyping=false
+        }
+        
+        if let mathsymbol = sender.currentTitle{
+         
+            brain.performOperation(symbol: mathsymbol)
+            
+           /* if mathsymbol == "pi"{
+                //display.text=String(M_PI) //converted double to string
+                displayedValue=M_PI
+            }
+            else if mathsymbol == "√"{
+                displayedValue=sqrt(displayedValue)
+            }*/
+        }
+        displayedValue=brain.result
+        
+    }
+    
     
 }
 
