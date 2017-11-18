@@ -44,23 +44,35 @@ class ViewController: UIViewController {
         
         // if we dont have label set it will give us nil so ! is used to get associate value
         
+        
         let digitwrapped = sender.currentTitle!
         let digit = sender.currentTitle
         
-        if userIsInTheMiddleOFTyping {
-            let textCurrentlyDisplayed = display!.text!
-            display!.text = textCurrentlyDisplayed + digitwrapped
-        }else{
-            display!.text = digitwrapped
+        if digit=="AC"
+        {
+            print("===========")
+            display!.text="0"
+            userIsInTheMiddleOFTyping=false
+            brain.resetAccumulator()
         }
-        
-        userIsInTheMiddleOFTyping = true
-        
-        print("touched wrappedone is \(String(describing: digitwrapped))")
-        print("touched one is \(String(describing: digit))")
-        print("touchDigit pressed")
+        else
+        {
+            if userIsInTheMiddleOFTyping
+            {
+                let textCurrentlyDisplayed = display!.text!
+                display!.text = textCurrentlyDisplayed + digitwrapped
+            }
+            else
+            {
+                display!.text = digitwrapped
+            }
+            userIsInTheMiddleOFTyping = true
+            
+            // print("touched wrappedone is \(String(describing: digitwrapped))")
+            // print("touched one is \(String(describing: digit))")
+            // print("touchDigit pressed")
+        }
     }
-    
    private var displayedValue: Double{
         get{
             return Double(display.text!)! //we have ! in the end for case "hello"
@@ -85,7 +97,7 @@ class ViewController: UIViewController {
          
             brain.performOperation(symbol: mathsymbol)
             
-           /* if mathsymbol == "pi"{
+           /* if mathsymbol == "π"{
                 //display.text=String(M_PI) //converted double to string
                 displayedValue=M_PI
             }
@@ -94,9 +106,6 @@ class ViewController: UIViewController {
             }*/
         }
         displayedValue=brain.result
-        
     }
-    
-    
 }
 
