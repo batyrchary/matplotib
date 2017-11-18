@@ -21,10 +21,12 @@ class CalculatorBrainModel{
     }
     
     private var operations : Dictionary<String, Operation>=[
-        "pi": Operation.Constant(M_PI),
+        "π": Operation.Constant(M_PI),
         "e":  Operation.Constant(M_E),
         "√": Operation.UnaryOperation(sqrt),
         "cos": Operation.UnaryOperation(cos),
+        "+/-": Operation.UnaryOperation({-$0}),
+        "%": Operation.UnaryOperation({$0/100}),
         "x": Operation.BinaryOperation(multiply),
         "+": Operation.BinaryOperation({$0 + $1}),
         "-": Operation.BinaryOperation({return $0 - $1 }),
@@ -40,47 +42,76 @@ class CalculatorBrainModel{
             case BinaryOperation((Double, Double) -> Double)
             case Equals
     }
+/////////////////////////////////
     
-    func performOperation(symbol: String) {
-        
-        if let operation = operations[symbol] {
-            switch operation{
-                
-            case Operation.Constant(let associatedvalue): accumulator=associatedvalue
-            case Operation.UnaryOperation(let assfunction): accumulator=assfunction(accumulator)
-            case Operation.BinaryOperation(let assfunction):
-                executebinarypendingOp()
-                pending=PendingOperationInfo (binaryFunction: assfunction, firstOperand: accumulator)
-            case Operation.Equals:
-                executebinarypendingOp()
+    private var ass:Double=0.0
+    private var previous=""
+    
+    func performOperation(symbol: String)
+    {
+        if let operation = operations[symbol]
+        {
+            if(previous != symbol)
+            {
+                ass=0
+                pending=nil
+            }
+            previous=symbol
+            switch operation
+            {
+                case Operation.Constant(let associatedvalue):
+                    accumulator=associatedvalue
+                case Operation.UnaryOperation(let assfunction):
+                    accumulator=assfunction(accumulator)
+                case Operation.BinaryOperation(let assfunction):
+                    executebinarypendingOp()
+                    pending=PendingOperationInfo (binaryFunction: assfunction, firstOperand: accumulator)
+                case Operation.Equals:
+                    if(ass==0)
+                    {
+                            ass=accumulator
+                    }
+                    else
+                    {
+                            pending!.firstOperand=ass
+                    }
+                    
+                    executebinarypendingOp()
             }
         }
-        
-      /*  switch symbol {
-        case "pi":accumulator=M_PI
-        case "√":accumulator=sqrt(accumulator)
-        default:
-            break
-        }*/
     }
+    
     private func executebinarypendingOp()
     {
-        if pending != nil{
+        if pending != nil
+        {
             accumulator=pending!.binaryFunction(pending!.firstOperand,accumulator)
-            pending=nil
+           // pending=nil
         }
     }
     
     private var pending: PendingOperationInfo?
     
-   private struct PendingOperationInfo{
+    private struct PendingOperationInfo
+    {
         var binaryFunction:(Double, Double)->Double
         var firstOperand: Double
     }
     
-    var result: Double{
-        
-        get{
+    
+////////////////////////////////////
+    
+    public func resetAccumulator()
+    {
+        accumulator=0.0
+        pending=nil
+        ass=0
+    }
+    
+    var result: Double
+    {
+        get
+        {
             return accumulator
         }
     }
