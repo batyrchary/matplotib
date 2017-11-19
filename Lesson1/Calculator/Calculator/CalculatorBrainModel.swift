@@ -11,6 +11,21 @@ import Foundation
 func multiply(ar1: Double, ar2: Double)-> Double{
     return ar1*ar2
 }
+func fact(ar1: Double)-> Double{
+    var ret : Double = 1
+    if ar1 < 0
+    {
+        return 0
+    }
+    var counter : Double = ar1
+    while(counter > 0)
+    {
+        ret=ret*counter
+        counter=counter-1
+    }
+    
+    return ret
+}
 
 class CalculatorBrainModel{
     
@@ -25,10 +40,21 @@ class CalculatorBrainModel{
         "e":  Operation.Constant(M_E),
         "√": Operation.UnaryOperation(sqrt),
         "cos": Operation.UnaryOperation(cos),
+        "sin": Operation.UnaryOperation(sin),
+        "cosh": Operation.UnaryOperation(cosh),
+        "sinh": Operation.UnaryOperation(sinh),
+        "tan": Operation.UnaryOperation(tan),
+        "tanh": Operation.UnaryOperation(tanh),
+        
+        "ln": Operation.UnaryOperation(log),
+        "log10": Operation.UnaryOperation(log10),
+        "log2": Operation.UnaryOperation(log2),
+        "!": Operation.UnaryOperation(fact),
         "+/-": Operation.UnaryOperation({-$0}),
         "%": Operation.UnaryOperation({$0/100}),
         "x": Operation.BinaryOperation(multiply),
         "+": Operation.BinaryOperation({$0 + $1}),
+        "xʸ": Operation.BinaryOperation(pow),
         "-": Operation.BinaryOperation({return $0 - $1 }),
         "÷": Operation.BinaryOperation({ (op1, op2) in return op1 / op2 }),
         "=": Operation.Equals
@@ -51,12 +77,8 @@ class CalculatorBrainModel{
     {
         if let operation = operations[symbol]
         {
-            if(previous != symbol)
-            {
-                ass=0
-                pending=nil
-            }
-            previous=symbol
+           
+            
             switch operation
             {
                 case Operation.Constant(let associatedvalue):
@@ -64,6 +86,13 @@ class CalculatorBrainModel{
                 case Operation.UnaryOperation(let assfunction):
                     accumulator=assfunction(accumulator)
                 case Operation.BinaryOperation(let assfunction):
+                    if(previous != symbol)
+                    {
+                        print("girdim")
+                        ass=0
+                        pending=nil
+                    }
+                    previous=symbol
                     executebinarypendingOp()
                     pending=PendingOperationInfo (binaryFunction: assfunction, firstOperand: accumulator)
                 case Operation.Equals:
@@ -73,7 +102,18 @@ class CalculatorBrainModel{
                     }
                     else
                     {
+                        if(pending != nil)
+                        {
                             pending!.firstOperand=ass
+                            if(previous=="÷" || previous=="-")
+                            {
+                               
+                                var temp:Double=pending!.firstOperand
+                                pending!.firstOperand=accumulator
+                                accumulator=temp
+                                print(temp)
+                            }
+                        }
                     }
                     
                     executebinarypendingOp()
