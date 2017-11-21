@@ -29,10 +29,12 @@ func fact(ar1: Double)-> Double{
 
 class CalculatorBrainModel{
     
+    private var internalProgram = [AnyObject]()
     
     private var accumulator: Double = 0.0
     func setOperand(operand: Double){
         accumulator=operand
+        internalProgram.append(operand as AnyObject)
     }
     
     private var operations : Dictionary<String, Operation>=[
@@ -75,6 +77,7 @@ class CalculatorBrainModel{
     
     func performOperation(symbol: String)
     {
+        internalProgram.append(symbol as AnyObject)
         if let operation = operations[symbol]
         {
            
@@ -88,6 +91,10 @@ class CalculatorBrainModel{
                 case Operation.BinaryOperation(let assfunction):
                     if(previous != symbol)
                     {
+                        if(previous != "=")
+                        {
+                            executebinarypendingOp()
+                        }
                         print("girdim")
                         ass=0
                         pending=nil
@@ -141,11 +148,59 @@ class CalculatorBrainModel{
     
 ////////////////////////////////////
     
+    typealias Propertylist = AnyObject
+    //var program : AnyObject
+    //typealias is same as typedef, so our object is of type propertylist and also of type Anyobject
+    var program : Propertylist
+    {
+        get{
+            return internalProgram as CalculatorBrainModel.Propertylist
+        }
+        set
+        {
+            resetAccumulator()
+            if let arrayOfOps = newValue as? [AnyObject]
+            {
+                for op in arrayOfOps
+                {
+                    if let operand = op as? Double
+                    {
+                        setOperand(operand: operand)
+                    }
+                    else if let operations = op as? String
+                    {
+                        performOperation(symbol: operations)
+                    }
+                }
+            }
+        }
+    }
+ 
+    
+    public func fit(his: String)->String
+    {
+        let size = his.count
+        
+        var str :String = his
+        if(size>10)
+        {
+           // let sub_hism = str.suffix(10)
+            //str=String(sub_hism)
+            return String(his.suffix(10))
+        }
+        
+        return his
+//        return str
+       // return String(his[size...])
+    }
+    
+    
     public func resetAccumulator()
     {
         accumulator=0.0
         pending=nil
         ass=0
+        internalProgram.removeAll()
     }
     
     var result: Double
