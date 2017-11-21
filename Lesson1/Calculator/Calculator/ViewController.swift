@@ -24,8 +24,13 @@ class ViewController: UIViewController {
     //Storage:farketmez shu an
     @IBOutlet private weak var display: UILabel!
     
-    //u are not allowed to have values without initial values
     
+
+    @IBOutlet private weak var history: UILabel!
+    
+    
+    
+    //u are not allowed to have values without initial values
     private var userIsInTheMiddleOFTyping: Bool = false
     
     //control key drag and drop
@@ -52,6 +57,8 @@ class ViewController: UIViewController {
         {
             print("===========")
             display!.text="0"
+            history!.text=brain.fit(his: "")
+            
             userIsInTheMiddleOFTyping=false
             brain.resetAccumulator()
         }
@@ -61,10 +68,18 @@ class ViewController: UIViewController {
             {
                 let textCurrentlyDisplayed = display!.text!
                 display!.text = textCurrentlyDisplayed + digitwrapped
+                
+               
+                let textCurrentlyDisplayed2 = history!.text!
+                history!.text = brain.fit(his: textCurrentlyDisplayed2 + digitwrapped)
+                
             }
             else
             {
                 display!.text = digitwrapped
+                
+                let textCurrentlyDisplayed2 = history!.text!
+                history!.text = brain.fit(his: textCurrentlyDisplayed2 + digitwrapped)
             }
             userIsInTheMiddleOFTyping = true
             
@@ -82,6 +97,27 @@ class ViewController: UIViewController {
         }
     }
     
+  
+    
+    
+    var savedProgram : CalculatorBrainModel.Propertylist?
+    
+    @IBAction func save() {
+        savedProgram = brain.program
+    }
+    
+    @IBAction func restore() {
+        if savedProgram != nil
+        {
+            brain.program=savedProgram!
+            displayedValue=brain.result
+            
+            history!.text=brain.fit(his: String(brain.result))
+        }
+    }
+    
+    
+    
     private var brain: CalculatorBrainModel = CalculatorBrainModel()
     //same as numbers
     @IBAction private func operation(_ sender: UIButton) {
@@ -97,6 +133,16 @@ class ViewController: UIViewController {
          
             brain.performOperation(symbol: mathsymbol)
             
+            let textCurrentlyDisplayed2 = history!.text!
+            history!.text = textCurrentlyDisplayed2 + mathsymbol
+            
+            if(mathsymbol=="=")
+            {
+                let textCurrentlyDisplayed2 = history!.text!
+                
+                history!.text = brain.fit(his: textCurrentlyDisplayed2 + String(brain.result))
+            }
+            
            /* if mathsymbol == "π"{
                 //display.text=String(M_PI) //converted double to string
                 displayedValue=M_PI
@@ -106,6 +152,8 @@ class ViewController: UIViewController {
             }*/
         }
         displayedValue=brain.result
+
+       
     }
 }
 
